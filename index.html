@@ -17,14 +17,12 @@
     #status-box { text-align: center; padding: 10px; border-radius: 6px; font-weight: bold; display: none; margin-bottom: 12px; }
     .ok { background-color: #e0f2f1; color: #004d40; }
     
-    /* Panel Oculto Administrativo */
     .secret-trigger { width: 40px; height: 40px; margin: 25px auto 0; cursor: pointer; opacity: 0.15; transition: opacity 0.2s; font-size: 20px; text-align: center; }
     .secret-trigger:hover { opacity: 0.6; }
     .panel-encargada { display: none; margin-top: 20px; border-top: 2px dashed #00a896; padding-top: 15px; }
     
-    /* Fichas de Inscritos en el Móvil de la Encargada */
     .rezador-row { background: #f9fbfb; border: 1px solid #cbd5e0; border-left: 5px solid #00a896; padding: 12px; border-radius: 6px; margin-bottom: 10px; text-align: left; font-size: 13px; }
-    button.wa-send-btn { background-color: #0288d1; color: white; border: none; padding: 8px 12px; border-radius: 4px; font-size: 12px; font-weight: bold; cursor: pointer; width: auto; margin-top: 8px; display: inline-block; }
+    button.wa-send-btn { background-color: #0288d1; color: white; border: none; padding: 8px 12px; border-radius: 4px; font-size: 12px; font-weight: bold; cursor: pointer; width: 100%; margin-top: 8px; box-sizing: border-box; }
   </style>
 </head>
 <body>
@@ -49,7 +47,7 @@
       <div class="card-eter">
         <div class="titulo-card">🎵 Relación con la Tribu</div>
         <label>Condición en el Coro:</label>
-        <select id="tipoParticipante" onchange="document.getElementById('invitado-row').style.display=this.value==='Invitado Nuevo'?'block':'none'">
+        <select id="tipoParticipante" onchange="document.getElementById('invitado-row').style.display=this.value Papel ==='Invitado Nuevo'?'block':'none'">
           <option value="Miembro de la Comunidad">Miembro estable de la Comunidad</option>
           <option value="Invitado Nuevo">Invitado Nuevo (Primera vez)</option>
         </select>
@@ -61,7 +59,7 @@
 
       <div class="card-eter">
         <div class="titulo-card">✨ Observaciones</div>
-        <label>Notas Especiales (Si tocas instrumentos o necesitas partituras):</label>
+        <label>Notas Especiales (Instrumentos o Apoyo):</label>
         <textarea id="notas" placeholder="Ej. Toca sonajas. Requiere apoyo con las letras..."></textarea>
       </div>
 
@@ -80,7 +78,7 @@
   </div>
   <script>
     // URL PROVISTA POR TU CUENTA DE GOOGLE APPS SCRIPT DE LA DIRECCIÓN CENTRO
-    const WEB_APP_URL_CENTRO = "https://script.google.com/macros/s/AKfycbyUbQRmUKD1fkt_KbWO-gfroC1x8bDqR-yze7kpADWjxQiVoRq39_RqMAUgrvTWOXUwgw/exec";
+    const WEB_APP_URL_CENTRO = "https://script.google.com/macros/s/AKfycbx3wpDBng7Y1vJDpy-cPI2snkq7lsW__9qjFaOvKy1AAFujeU11viJ4izchAXjHkxvq3g/execPEGA_AQUÍ_TU_URL_DE_APPS_SCRIPT_DEL_CENTRO";
 
     function avisarEstado(txt) {
       var box = document.getElementById("status-box");
@@ -88,11 +86,10 @@
       window.scrollTo(0,0);
     }
 
-    // 1. ENVÍO DESDE LA PANTALLA GENERAL LIBRE (COMUNIDAD)
     function guardarInscripcionPublica() {
       var nombreTxt = document.getElementById("nombreRezador").value;
       var telfTxt = document.getElementById("telefono").value;
-      if (!nombreTxt.trim()) { alert("Por favor ingresa tu nombre para inscribirte."); return; }
+      if (!nombreTxt.trim()) { alert("Por favor ingresa tu nombre."); return; }
       
       avisarEstado("Enviando hilos sonoros al altar del Centro...");
 
@@ -112,8 +109,7 @@
         body: JSON.stringify(datos)
       })
       .then(function() {
-        avisarEstado("🌀 ¡Tu inscripción ha sido enviada con éxito! La Encargada del Coro validará tu registro y te enviará las indicaciones por WhatsApp.");
-        // Limpieza estricta de casillas públicas
+        avisarEstado("🌀 ¡Tu inscripción ha sido enviada con éxito! La Encargada validará tu registro.");
         document.getElementById("nombreRezador").value = "";
         document.getElementById("telefono").value = "";
         document.getElementById("invitadoPor").value = "";
@@ -121,18 +117,16 @@
       });
     }
 
-    // 2. FILTRO DE ENTRADA EXCLUSIVO PARA LA ENCARGADA
     function abrirConsolaEncargada() {
       var clave = prompt("Introduce la clave de la Encargada del Centro:");
       if (clave === "Eter2026" || clave === "2009") { 
         document.getElementById("sec-admin-coro").style.display = "block";
         cargarRezadoresInscritos();
       } else if (clave !== null) {
-        alert("❌ Clave incorrecta. El rezo del Éter custodia este panel.");
+        alert("❌ Clave incorrecta.");
       }
     }
 
-    // 3. JALAR LOS REGISTROS DESDE EL SHEETS AL TELÉFONO DE LA ENCARGADA
     function cargarRezadoresInscritos() {
       var listaBox = document.getElementById("listado-rezadores-vivos");
       listaBox.innerHTML = "<p style='font-size:12px; color:#7f8c8d;'>Leyendo el registro oficial de voces...</p>";
@@ -153,41 +147,35 @@
             var div = document.createElement("div");
             div.className = "rezador-row";
             
-            // 🔒 SOLUCIÓN DE COMILLAS INVERTIDAS: Blindado contra espacios y tildes
-            div.innerHTML = `
-              <b>👤 Rezador:</b> ${r.nombre}<br>
-              <b>📱 Teléfono:</b> ${r.telefono}<br>
-              <b>✨ Tipo:</b> ${r.tipo} ${r.invitadoPor ? '(Por: ' + r.invitadoPor + ')' : ''}<br>
-              <b>📝 Notas:</b> ${r.notas ? r.notas : '-'}<br>
-              <button class="wa-send-btn" id="btn-wa-${i}">📲 Enviar Confirmación y Ubicación</button>
-            `;
+            // Estructura lineal blindada: Almacenamos los datos en atributos planos del botón
+            div.innerHTML = "<b>👤 Rezador:</b> " + r.nombre + "<br>" +
+                            "<b>📱 Teléfono:</b> " + r.telefono + "<br>" +
+                            "<b>✨ Tipo:</b> " + r.tipo + (r.invitadoPor ? " (Por: " + r.invitadoPor + ")" : "") + "<br>" +
+                            "<b>📝 Notas:</b> " + (r.notas ? r.notas : "-") + "<br>" +
+                            "<button class='wa-send-btn' data-telf='" + r.telefono + "' data-nom='" + r.nombre + "' data-tipo='" + r.tipo + "' onclick='ejecutarWhatsAppNativo(this)'>📲 Enviar Confirmación y Ubicación</button>";
             
             listaBox.appendChild(div);
-
-            // Amarrar el evento de forma nativa en memoria (Sin usar onclick en texto)
-            (function(tel, nom, tp) {
-              document.getElementById(`btn-wa-${i}`).addEventListener("click", function() {
-                prepararYEnviarWhatsApp(tel, nom, tp);
-              });
-            })(r.telefono, r.nombre, r.tipo);
           }
         });
     }
 
-    // FUNCIÓN INTERMEDIA BLINDADA CONTRA ERRORES DE CARACTERES EN EL MÓVIL
-    function prepararYEnviarWhatsApp(telf, nombre, tipo) {
+    // EXTRACCIÓN DIRECTA DESDE EL ELEMENTO TOCADO - CERO RIESGO DE COMILLAS
+    function ejecutarWhatsAppNativo(btnElement) {
+      var telf = btnElement.getAttribute("data-telf");
+      var nombre = btnElement.getAttribute("data-nom");
+      var tipo = btnElement.getAttribute("data-tipo");
+      
       if (!telf || telf === "-") { alert("Este rezador no registró un número válido."); return; }
       
-      var ubicacionFija = "Calle Pedro Galvez 3826 Zona Av. Paraguá casi 4to. Anillo - Templo Jeyajé";
-      var mapaFijo = "https://maps.app.goo.gl/sP8nXgYoFUQt14Po7";
+      var ubicacionFija = "Templo Jeyajé, Calle Pedro Galvez 3826 Zona Av. Paraguá casi 4to. Anillo";
+      var mapaFijo = "https://maps.app.goo.gl/sP8nXgYoFUQt14Po7e.com";
       
-      // Armado lineal del texto para evitar enredos de comillas en el navegador del celular
-      var textoWhatsApp = "¡Hola *" + nombre + "*! 🌀 Confirmamos tu registro para el próximo encuentro e integración del Coro Jeyajé Arco Iris.\n\n" +
+      var textoWhatsApp = "¡Hola *" + nombre + "*! 🌀 Confirmamos tu registro para el próximo encuentro del Coro Jeyajé Arco Iris.\n\n" +
                            "📍 *Lugar:* " + ubicacionFija + "\n" +
-                           "🗺️ *Mapa:* " + mapaFijo + "\n" +
+                           "🗺 *Mapa:* " + mapaFijo + "\n" +
                            "✨ *Condición:* " + tipo + "\n\n" +
                            "🎵 *RECOMENDACIONES PARA EL REZO:* \n" +
-                           "• Traer ropa cómoda y ligera.\n" +
+                           "• Ven con ropa cómoda y ligera.\n" +
                            "• Tu botellita de agua para cuidar la voz.\n" +
                            "• Si tienes instrumentos, son bienvenidos.\n\n" +
                            "_*Tu voz expande el rezo. ¡Nos vemos en el círculo!_";
@@ -195,11 +183,6 @@
       var urlWa = "https://whatsapp.com" + telf.trim() + "&text=" + encodeURIComponent(textoWhatsApp);
       window.open(urlWa, '_blank');
     }
-
-    window.onload = function() {
-      // Intento silencioso de precarga para agilizar la red en el primer inicio
-      console.log("Portal del Centro sintonizado.");
-    };
   </script>
 </body>
 </html>
