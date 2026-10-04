@@ -153,16 +153,23 @@
             var div = document.createElement("div");
             div.className = "rezador-row";
             
-            // Corrección quirúrgica: El mensaje se construye de forma limpia por cada botón
-            var botonHtml = "<button class='wa-send-btn' onclick='prepararYEnviarWhatsApp(\"" + r.telefono + "\", \"" + r.nombre + "\", \"" + r.tipo + "\")'>📲 Enviar Confirmación y Ubicación</button>";
-            
-            div.innerHTML = "<b>👤 Rezador:</b> " + r.nombre + "<br>" +
-                            "<b>📱 Teléfono:</b> " + r.telefono + "<br>" +
-                            "<b>✨ Tipo:</b> " + r.tipo + (r.invitadoPor ? " (Por: " + r.invitadoPor + ")" : "") + "<br>" +
-                            "<b>📝 Notas:</b> " + (r.notas ? r.notas : "-") + "<br>" +
-                            botonHtml;
+            // 🔒 SOLUCIÓN DE COMILLAS INVERTIDAS: Blindado contra espacios y tildes
+            div.innerHTML = `
+              <b>👤 Rezador:</b> ${r.nombre}<br>
+              <b>📱 Teléfono:</b> ${r.telefono}<br>
+              <b>✨ Tipo:</b> ${r.tipo} ${r.invitadoPor ? '(Por: ' + r.invitadoPor + ')' : ''}<br>
+              <b>📝 Notas:</b> ${r.notas ? r.notas : '-'}<br>
+              <button class="wa-send-btn" id="btn-wa-${i}">📲 Enviar Confirmación y Ubicación</button>
+            `;
             
             listaBox.appendChild(div);
+
+            // Amarrar el evento de forma nativa en memoria (Sin usar onclick en texto)
+            (function(tel, nom, tp) {
+              document.getElementById(`btn-wa-${i}`).addEventListener("click", function() {
+                prepararYEnviarWhatsApp(tel, nom, tp);
+              });
+            })(r.telefono, r.nombre, r.tipo);
           }
         });
     }
