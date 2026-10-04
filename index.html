@@ -13,107 +13,107 @@
     label { display: block; margin: 10px 0 4px; font-size: 13px; font-weight: 600; color: #4a5568; }
     input, select, textarea { width: 100%; padding: 10px; border: 1px solid #cbd5e0; border-radius: 6px; box-sizing: border-box; font-size: 14px; margin-bottom: 5px; }
     textarea { height: 60px; resize: none; }
-    button { width: 100%; padding: 12px; background-color: #00a896; color: white; border: none; border-radius: 6px; font-size: 15px; font-weight: bold; margin-top: 15px; cursor: pointer; box-shadow: 0 4px 10px rgba(0, 168, 150, 0.2); }
-    #status-box { text-align: center; margin-top: 12px; padding: 10px; border-radius: 6px; font-weight: bold; display: none; margin-bottom: 12px; }
-    .exito { background-color: #e0f2f1; color: #004d40; }
-    #wa-box { display: none; margin-top: 15px; background: #e1f5fe; border-left: 4px solid #0288d1; padding: 15px; border-radius: 6px; }
+    button.save-btn { width: 100%; padding: 12px; background-color: #00a896; color: white; border: none; border-radius: 6px; font-size: 15px; font-weight: bold; cursor: pointer; margin-top: 10px; }
+    #status-box { text-align: center; padding: 10px; border-radius: 6px; font-weight: bold; display: none; margin-bottom: 12px; }
+    .ok { background-color: #e0f2f1; color: #004d40; }
+    
+    /* Panel Oculto Administrativo */
+    .secret-trigger { width: 40px; height: 40px; margin: 25px auto 0; cursor: pointer; opacity: 0.15; transition: opacity 0.2s; font-size: 20px; text-align: center; }
+    .secret-trigger:hover { opacity: 0.6; }
+    .panel-encargada { display: none; margin-top: 20px; border-top: 2px dashed #00a896; padding-top: 15px; }
+    
+    /* Fichas de Inscritos en el Móvil de la Encargada */
+    .rezador-row { background: #f9fbfb; border: 1px solid #cbd5e0; border-left: 5px solid #00a896; padding: 12px; border-radius: 6px; margin-bottom: 10px; text-align: left; font-size: 13px; }
+    button.wa-send-btn { background-color: #0288d1; color: white; border: none; padding: 8px 12px; border-radius: 4px; font-size: 12px; font-weight: bold; cursor: pointer; width: auto; margin-top: 8px; display: inline-block; }
   </style>
 </head>
 <body>
 
   <div class="container">
     <h2>🌀 Dirección del Centro (Éter)</h2>
-    <h3>Registro de Voces del Coro</h3>
-    <p style="font-size:12px; color:#7f8c8d; text-align:center; margin-top:-8px;">Anotación de integrantes y nuevos invitados para el tejido armónico.</p>
-    
     <div id="status-box"></div>
 
-    <!-- IDENTIDAD -->
-    <div class="card-eter">
-      <div class="titulo-card">👤 Ficha del Rezador</div>
-      <label>Nombre Completo:</label>
-      <input type="text" id="nombreRezador" placeholder="Ej. Ana María Claros">
+    <!-- PANTALLA PÚBLICA DE INSCRIPCIÓN -->
+    <div id="pantalla-inscripcion">
+      <h3>Inscripción de Voces - Coro Jeyajé</h3>
+      <p style="font-size:12px; color:#7f8c8d; text-align:center; margin-top:-8px;">Suma tu canto y medicina al círculo armónico de la Tribu.</p>
       
-      <label>Número de WhatsApp:</label>
-      <input type="text" id="telefono" placeholder="Ej. 59170000000">
-    </div>
-
-    <!-- TIPO PARTICIPANTE -->
-    <div class="card-eter">
-      <div class="titulo-card">🎵 Relación con la Tribu</div>
-      <label>Condición en el Coro:</label>
-      <select id="tipoParticipante" onchange="document.getElementById('invitado-row').style.display=this.value.includes('Invitado')?'block':'none'">
-        <option value="Miembro de la Comunidad">Miembro estable de la Comunidad</option>
-        <option value="Invitado Nuevo">Invitado Nuevo (Primera vez)</option>
-      </select>
-      
-      <div id="invitado-row" style="display:none; margin-top:10px;">
-        <label>¿Invitado por quién? (Nombre del contacto en la Tribu):</label>
-        <input type="text" id="invitadoPor" placeholder="Ej. Sostenido por Guardián del Este">
+      <div class="card-eter">
+        <div class="titulo-card">👤 Ficha de Identidad</div>
+        <label>Nombre Completo:</label>
+        <input type="text" id="nombreRezador" placeholder="Ej. Ana María Claros">
+        <label>Número de WhatsApp:</label>
+        <input type="text" id="telefono" placeholder="Ej. 59170000000">
       </div>
+
+      <div class="card-eter">
+        <div class="titulo-card">🎵 Relación con la Tribu</div>
+        <label>Condición en el Coro:</label>
+        <select id="tipoParticipante" onchange="document.getElementById('invitado-row').style.display=this.value==='Invitado Nuevo'?'block':'none'">
+          <option value="Miembro de la Comunidad">Miembro estable de la Comunidad</option>
+          <option value="Invitado Nuevo">Invitado Nuevo (Primera vez)</option>
+        </select>
+        <div id="invitado-row" style="display:none; margin-top:10px;">
+          <label>¿Invitado por quién? (Contacto interno en la Tribu):</label>
+          <input type="text" id="invitadoPor" placeholder="Ej. Sostenido por Guardián del Este">
+        </div>
+      </div>
+
+      <div class="card-eter">
+        <div class="titulo-card">✨ Observaciones</div>
+        <label>Notas Especiales (Si tocas instrumentos o necesitas partituras):</label>
+        <textarea id="notas" placeholder="Ej. Toca sonajas. Requiere apoyo con las letras..."></textarea>
+      </div>
+
+      <button class="save-btn" onclick="guardarInscripcionPublica()">Enviar Mi Inscripción al Coro 🌀</button>
     </div>
 
-    <!-- OBSERVACIONES -->
-    <div class="card-eter">
-      <div class="titulo-card">✨ Notas Adicionales</div>
-      <label>Observaciones o Notas Especiales:</label>
-      <textarea id="notas" placeholder="Ej. Toca guitarra. Requiere apoyo con las partituras del cancionero..."></textarea>
-    </div>
+    <!-- BOTÓN OCULTO DE ENGRANAJE EXCLUSIVO PARA LA ENCARGADA -->
+    <div class="secret-trigger" onclick="abrirConsolaEncargada()">⚙️</div>
 
-    <button onclick="guardarVozCentro()">Sellar Registro e Integrar al Coro 🌀</button>
-
-    <!-- SECCIÓN DIDÁCTICA WHATSAPP DIRECTO -->
-    <div id="wa-box">
-      <h4 style="margin:0 0 10px 0; color:#01579b;">📱 Mensaje de Sintonía Listo</h4>
-      <p style="font-size:12px; color:#455a64; margin-bottom:10px;">Presiona el botón de abajo para enviar las recomendaciones, mapa y ubicación directo al WhatsApp del rezador.</p>
-      <button onclick="dispararWhatsAppCentro()" style="background-color:#0288d1; margin-top:0; color:white;">📲 Enviar Recomendaciones por WhatsApp</button>
+    <!-- PANTALLA PRIVADA ADMINISTRATIVA DE LA ENCARGADA -->
+    <div id="sec-admin-coro" class="panel-encargada">
+      <h3>🦅 Consola Administrativa del Coro</h3>
+      <button class="save-btn" style="background-color:#2c3e50; margin-bottom:15px;" onclick="cargarRezadoresInscritos()">🔄 Actualizar Lista de Espera</button>
+      <div id="listado-rezadores-vivos"></div>
     </div>
   </div>
   <script>
     // URL PROVISTA POR TU CUENTA DE GOOGLE APPS SCRIPT DE LA DIRECCIÓN CENTRO
-    const WEB_APP_URL_CENTRO = "https://script.google.com/macros/s/AKfycbw7KWLmfvZd1M7-KlcjOHPdb73juu-OMTF_McZCxlZtOQ_g_X2DimvAX7Abvcr3bcCHPQ/exec";
-    var mensajeWhatsAppListo = "";
-    var telefonoDestino = "";
+    const WEB_APP_URL_CENTRO = "https://script.google.com/macros/s/AKfycbyUbQRmUKD1fkt_KbWO-gfroC1x8bDqR-yze7kpADWjxQiVoRq39_RqMAUgrvTWOXUwgw/exec";
 
-    function mostrarAlerta(msg) {
+    function avisarEstado(txt) {
       var box = document.getElementById("status-box");
-      box.innerText = msg; box.className = "status-box exito"; box.style.display = "block";
+      box.innerText = txt; box.className = "ok"; box.style.display = "block";
       window.scrollTo(0,0);
     }
 
-    function guardarVozCentro() {
+    // 1. ENVÍO DESDE LA PANTALLA GENERAL LIBRE (COMUNIDAD)
+    function guardarInscripcionPublica() {
       var nombreTxt = document.getElementById("nombreRezador").value;
       var telfTxt = document.getElementById("telefono").value;
-      if (!nombreTxt.trim()) { alert("Por favor ingresa el nombre del rezador."); return; }
+      if (!nombreTxt.trim()) { alert("Por favor ingresa tu nombre para inscribirte."); return; }
       
-      mostrarAlerta("Tejiendo hilos sonoros en el altar del Centro...");
-      telefonoDestino = telfTxt.trim();
+      avisarEstado("Enviando hilos sonoros al altar del Centro...");
 
-      var datosVoces = {
+      var datos = {
         target_sheet: "Coro_Historial",
         nombre: nombreTxt,
         telefono: telfTxt,
         tipoParticipante: document.getElementById("tipoParticipante").value,
         invitadoPor: document.getElementById("invitadoPor").value,
-        notas: document.getElementById("notas").value
+        notes: document.getElementById("notas").value
       };
 
       fetch(WEB_APP_URL_CENTRO, {
         method: "POST",
         mode: "no-cors",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(datosVoces)
+        body: JSON.stringify(datos)
       })
       .then(function() {
-        mostrarAlerta("🌀 ¡" + nombreTxt + " registrado con éxito en la bitácora del sonido!");
-        
-        // Armar el mensaje nativo local
-        var condicionTxt = datosVoces.tipoParticipante;
-        mensajeWhatsAppListo = "¡Hola *" + nombreTxt.trim() + "*! 🌀 Confirmamos tu registro para el próximo encuentro del Coro Jeyajé Arco Iris.\n\n📍 *Lugar:* Km 12 doble vía a La Guardia (Maloca Central)\n🗺️ *Mapa:* https://google.com\n✨ *Condición:* " + condicionTxt + "\n\n🎵 *RECOMENDACIONES:* \n• Traer ropa cómoda y ligera.\n• Tu botellita de agua para cuidar la voz.\n• Si tienes instrumentos, son bienvenidos.\n\n¡Tu voz expande el rezo!";
-        
-        document.getElementById("wa-box").style.display = "block";
-        
-        // Limpieza de campos
+        avisarEstado("🌀 ¡Tu inscripción ha sido enviada con éxito! La Encargada del Coro validará tu registro y te enviará las indicaciones por WhatsApp.");
+        // Limpieza estricta de casillas públicas
         document.getElementById("nombreRezador").value = "";
         document.getElementById("telefono").value = "";
         document.getElementById("invitadoPor").value = "";
@@ -121,9 +121,63 @@
       });
     }
 
-    function dispararWhatsAppCentro() {
-      if (!telefonoDestino) { alert("No hay un número de teléfono válido."); return; }
-      var urlWa = "https://whatsapp.com" + telefonoDestino + "&text=" + encodeURIComponent(mensajeWhatsAppListo);
+    // 2. FILTRO DE ENTRADA EXCLUSIVO PARA LA ENCARGADA
+    function abrirConsolaEncargada() {
+      var clave = prompt("Introduce la clave de la Encargada del Centro:");
+      if (clave === "Eter2026" || clave === "2009") { // Reconoce claves vivas o maestras
+        document.getElementById("sec-admin-coro").style.display = "block";
+        cargarRezadoresInscritos();
+      } else if (clave !== null) {
+        alert("❌ Clave incorrecta. El rezo del Éter custodia este panel.");
+      }
+    }
+
+    // 3. JALAR LOS REGISTROS DESDE EL SHEETS AL TELÉFONO DE LA ENCARGADA
+    function cargarRezadoresInscritos() {
+      var listaBox = document.getElementById("listado-rezadores-vivos");
+      listaBox.innerHTML = "<p style='font-size:12px; color:#7f8c8d;'>Leyendo el registro oficial de voces...</p>";
+      
+      fetch(WEB_APP_URL_CENTRO)
+        .then(res => res.json())
+        .then(data => {
+          if (!data || !data.rezadores || data.rezadores.length === 0) {
+            listaBox.innerHTML = "<p style='font-size:12px; color:#7f8c8d;'>No hay voces en espera en esta luna.</p>";
+            return;
+          }
+          
+          listaBox.innerHTML = "";
+          var lista = data.rezadores;
+          
+          for (var i = 0; i < lista.length; i++) {
+            var r = lista[i];
+            var div = document.createElement("div");
+            div.className = "rezador-row";
+            
+            // Reconstrucción del bloque de texto formateado para el disparo nativo
+            var mensajeWhatsApp = "¡Hola *" + r.nombre + "*! 🌀 Confirmamos tu registro para el próximo encuentro e integración del Coro Jeyajé Arco Iris.\n\n" +
+                                  "📍 *Lugar:* Calle Pedro Galvez 3826 Zona Av. Paraguá casi 4to. Anillo (Templo Jeyajé)\n" +
+                                  "🗺️ *Mapa:* https://maps.app.goo.gl/sP8nXgYoFUQt14Po7\n" +
+                                  "✨ *Condición:* " + r.tipo + "\n\n" +
+                                  "🎵 *RECOMENDACIONES PARA EL REZO:* \n" +
+                                  "• Traer ropa cómoda y ligera.\n" +
+                                  "• Tu botellita de agua para cuidar la voz.\n" +
+                                  "• Si tienes instrumentos (sonajas, tambor), son bienvenidos.\n\n" +
+                                  "_*Tu voz expande el rezo. ¡Nos vemos en el círculo!_";
+            
+            div.innerHTML = "<b>👤 Rezador:</b> " + r.nombre + "<br>" +
+                            "<b>📱 Teléfono:</b> " + r.telefono + "<br>" +
+                            "<b>✨ Tipo:</b> " + r.tipo + (r.invitadoPor ? " (Por: " + r.invitadoPor + ")" : "") + "<br>" +
+                            "<b>📝 Notas:</b> " + (r.notas ? r.notas : "-") + "<br>" +
+                            "<button class='wa-send-btn' onclick='dispararWhatsAppEncargada(\"" + r.telefono + "\", `" + encodeURIComponent(mensajeWhatsApp) + "`)'>📲 Enviar Confirmación y Ubicación</button>";
+            
+            listaBox.appendChild(div);
+          }
+        });
+    }
+
+    function dispararWhatsAppEncargada(telf, msgEncoded) {
+      if (!telf || telf === "-") { alert("Este rezador no registró un número válido."); return; }
+      var urlWa = "https://whatsapp.com" + telf + "&text=" + msgEncoded;
       window.open(urlWa, '_blank');
     }
   </script>
