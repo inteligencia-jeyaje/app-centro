@@ -102,7 +102,7 @@
         telefono: telfTxt,
         tipoParticipante: document.getElementById("tipoParticipante").value,
         invitadoPor: document.getElementById("invitadoPor").value,
-        notes: document.getElementById("notas").value
+        notas: document.getElementById("notas").value
       };
 
       fetch(WEB_APP_URL_CENTRO, {
@@ -124,7 +124,7 @@
     // 2. FILTRO DE ENTRADA EXCLUSIVO PARA LA ENCARGADA
     function abrirConsolaEncargada() {
       var clave = prompt("Introduce la clave de la Encargada del Centro:");
-      if (clave === "Eter2026" || clave === "2009") { // Reconoce claves vivas o maestras
+      if (clave === "Eter2026" || clave === "2009") { 
         document.getElementById("sec-admin-coro").style.display = "block";
         cargarRezadoresInscritos();
       } else if (clave !== null) {
@@ -153,33 +153,46 @@
             var div = document.createElement("div");
             div.className = "rezador-row";
             
-            // Reconstrucción del bloque de texto formateado para el disparo nativo
-            var mensajeWhatsApp = "¡Hola *" + r.nombre + "*! 🌀 Confirmamos tu registro para el próximo encuentro e integración del Coro Jeyajé Arco Iris.\n\n" +
-                                  "📍 *Lugar:* Calle Pedro Galvez 3826 Zona Av. Paraguá casi 4to. Anillo (Templo Jeyajé)\n" +
-                                  "🗺️ *Mapa:* https://maps.app.goo.gl/sP8nXgYoFUQt14Po7\n" +
-                                  "✨ *Condición:* " + r.tipo + "\n\n" +
-                                  "🎵 *RECOMENDACIONES PARA EL REZO:* \n" +
-                                  "• Traer ropa cómoda y ligera.\n" +
-                                  "• Tu botellita de agua para cuidar la voz.\n" +
-                                  "• Si tienes instrumentos (sonajas, tambor), son bienvenidos.\n\n" +
-                                  "_*Tu voz expande el rezo. ¡Nos vemos en el círculo!_";
+            // Corrección quirúrgica: El mensaje se construye de forma limpia por cada botón
+            var botonHtml = "<button class='wa-send-btn' onclick='prepararYEnviarWhatsApp(\"" + r.telefono + "\", \"" + r.nombre + "\", \"" + r.tipo + "\")'>📲 Enviar Confirmación y Ubicación</button>";
             
             div.innerHTML = "<b>👤 Rezador:</b> " + r.nombre + "<br>" +
                             "<b>📱 Teléfono:</b> " + r.telefono + "<br>" +
                             "<b>✨ Tipo:</b> " + r.tipo + (r.invitadoPor ? " (Por: " + r.invitadoPor + ")" : "") + "<br>" +
                             "<b>📝 Notas:</b> " + (r.notas ? r.notas : "-") + "<br>" +
-                            "<button class='wa-send-btn' onclick='dispararWhatsAppEncargada(\"" + r.telefono + "\", `" + encodeURIComponent(mensajeWhatsApp) + "`)'>📲 Enviar Confirmación y Ubicación</button>";
+                            botonHtml;
             
             listaBox.appendChild(div);
           }
         });
     }
 
-    function dispararWhatsAppEncargada(telf, msgEncoded) {
+    // FUNCIÓN INTERMEDIA BLINDADA CONTRA ERRORES DE CARACTERES EN EL MÓVIL
+    function prepararYEnviarWhatsApp(telf, nombre, tipo) {
       if (!telf || telf === "-") { alert("Este rezador no registró un número válido."); return; }
-      var urlWa = "https://whatsapp.com" + telf + "&text=" + msgEncoded;
+      
+      var ubicacionFija = "Calle Pedro Galvez 3826 Zona Av. Paraguá casi 4to. Anillo - Templo Jeyajé";
+      var mapaFijo = "https://maps.app.goo.gl/sP8nXgYoFUQt14Po7";
+      
+      // Armado lineal del texto para evitar enredos de comillas en el navegador del celular
+      var textoWhatsApp = "¡Hola *" + nombre + "*! 🌀 Confirmamos tu registro para el próximo encuentro e integración del Coro Jeyajé Arco Iris.\n\n" +
+                           "📍 *Lugar:* " + ubicacionFija + "\n" +
+                           "🗺️ *Mapa:* " + mapaFijo + "\n" +
+                           "✨ *Condición:* " + tipo + "\n\n" +
+                           "🎵 *RECOMENDACIONES PARA EL REZO:* \n" +
+                           "• Traer ropa cómoda y ligera.\n" +
+                           "• Tu botellita de agua para cuidar la voz.\n" +
+                           "• Si tienes instrumentos, son bienvenidos.\n\n" +
+                           "_*Tu voz expande el rezo. ¡Nos vemos en el círculo!_";
+      
+      var urlWa = 'https://whatsapp.com' + telf.trim() + "&text=" + encodeURIComponent(textoWhatsApp);
       window.open(urlWa, '_blank');
     }
+
+    window.onload = function() {
+      // Intento silencioso de precarga para agilizar la red en el primer inicio
+      console.log("Portal del Centro sintonizado.");
+    };
   </script>
 </body>
 </html>
