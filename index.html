@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>Dirección Centro - Registro de Voces</title>
+  <style>
+    body { font-family: 'Segoe UI', Arial, sans-serif; margin: 0; padding: 12px; background-color: #f4f7f6; color: #333; }
+    .container { max-width: 500px; margin: auto; background: white; padding: 20px; border-radius: 12px; box-shadow: 0 4px 15px rgba(0,0,0,0.05); border-top: 6px solid #00a896; }
+    h2, h3 { text-align: center; color: #2c3e50; margin-top: 5px; }
+    .card-eter { background: #fdfdfd; border: 1px solid #e0f2f1; padding: 15px; border-radius: 8px; margin-bottom: 12px; }
+    .titulo-card { font-size: 14px; font-weight: bold; color: #00a896; margin-bottom: 10px; border-bottom: 1px dashed #00a896; padding-bottom: 4px; }
+    label { display: block; margin: 10px 0 4px; font-size: 13px; font-weight: 600; color: #4a5568; }
+    input, select, textarea { width: 100%; padding: 10px; border: 1px solid #cbd5e0; border-radius: 6px; box-sizing: border-box; font-size: 14px; margin-bottom: 5px; }
+    textarea { height: 60px; resize: none; }
+    button { width: 100%; padding: 12px; background-color: #00a896; color: white; border: none; border-radius: 6px; font-size: 15px; font-weight: bold; margin-top: 15px; cursor: pointer; box-shadow: 0 4px 10px rgba(0, 168, 150, 0.2); }
+    #status-box { text-align: center; margin-top: 12px; padding: 10px; border-radius: 6px; font-weight: bold; display: none; margin-bottom: 12px; }
+    .exito { background-color: #e0f2f1; color: #004d40; }
+    #wa-box { display: none; margin-top: 15px; background: #e1f5fe; border-left: 4px solid #0288d1; padding: 15px; border-radius: 6px; }
+  </style>
+</head>
+<body>
+
+  <div class="container">
+    <h2>🌀 Dirección del Centro (Éter)</h2>
+    <h3>Registro de Voces del Coro</h3>
+    <p style="font-size:12px; color:#7f8c8d; text-align:center; margin-top:-8px;">Anotación de integrantes y nuevos invitados para el tejido armónico.</p>
+    
+    <div id="status-box"></div>
+
+    <!-- IDENTIDAD -->
+    <div class="card-eter">
+      <div class="titulo-card">👤 Ficha del Rezador</div>
+      <label>Nombre Completo:</label>
+      <input type="text" id="nombreRezador" placeholder="Ej. Ana María Claros">
+      
+      <label>Número de WhatsApp:</label>
+      <input type="text" id="telefono" placeholder="Ej. 59170000000">
+    </div>
+
+    <!-- TIPO PARTICIPANTE -->
+    <div class="card-eter">
+      <div class="titulo-card">🎵 Relación con la Tribu</div>
+      <label>Condición en el Coro:</label>
+      <select id="tipoParticipante" onchange="document.getElementById('invitado-row').style.display=this.value.includes('Invitado')?'block':'none'">
+        <option value="Miembro de la Comunidad">Miembro estable de la Comunidad</option>
+        <option value="Invitado Nuevo">Invitado Nuevo (Primera vez)</option>
+      </select>
+      
+      <div id="invitado-row" style="display:none; margin-top:10px;">
+        <label>¿Invitado por quién? (Nombre del contacto en la Tribu):</label>
+        <input type="text" id="invitadoPor" placeholder="Ej. Sostenido por Guardián del Este">
+      </div>
+    </div>
+
+    <!-- OBSERVACIONES -->
+    <div class="card-eter">
+      <div class="titulo-card">✨ Notas Adicionales</div>
+      <label>Observaciones o Notas Especiales:</label>
+      <textarea id="notas" placeholder="Ej. Toca guitarra. Requiere apoyo con las partituras del cancionero..."></textarea>
+    </div>
+
+    <button onclick="guardarVozCentro()">Sellar Registro e Integrar al Coro 🌀</button>
+
+    <!-- SECCIÓN DIDÁCTICA WHATSAPP DIRECTO -->
+    <div id="wa-box">
+      <h4 style="margin:0 0 10px 0; color:#01579b;">📱 Mensaje de Sintonía Listo</h4>
+      <p style="font-size:12px; color:#455a64; margin-bottom:10px;">Presiona el botón de abajo para enviar las recomendaciones, mapa y ubicación directo al WhatsApp del rezador.</p>
+      <button onclick="dispararWhatsAppCentro()" style="background-color:#0288d1; margin-top:0; color:white;">📲 Enviar Recomendaciones por WhatsApp</button>
+    </div>
+  </div>
+  <script>
+    // URL PROVISTA POR TU CUENTA DE GOOGLE APPS SCRIPT DE LA DIRECCIÓN CENTRO
+    const WEB_APP_URL_CENTRO = "https://script.google.com/macros/s/AKfycbw7KWLmfvZd1M7-KlcjOHPdb73juu-OMTF_McZCxlZtOQ_g_X2DimvAX7Abvcr3bcCHPQ/exec";
+    var mensajeWhatsAppListo = "";
+    var telefonoDestino = "";
+
+    function mostrarAlerta(msg) {
+      var box = document.getElementById("status-box");
+      box.innerText = msg; box.className = "status-box exito"; box.style.display = "block";
+      window.scrollTo(0,0);
+    }
+
+    function guardarVozCentro() {
+      var nombreTxt = document.getElementById("nombreRezador").value;
+      var telfTxt = document.getElementById("telefono").value;
+      if (!nombreTxt.trim()) { alert("Por favor ingresa el nombre del rezador."); return; }
+      
+      mostrarAlerta("Tejiendo hilos sonoros en el altar del Centro...");
+      telefonoDestino = telfTxt.trim();
+
+      var datosVoces = {
+        target_sheet: "Coro_Historial",
+        nombre: nombreTxt,
+        telefono: telfTxt,
+        tipoParticipante: document.getElementById("tipoParticipante").value,
+        invitadoPor: document.getElementById("invitadoPor").value,
+        notas: document.getElementById("notas").value
+      };
+
+      fetch(WEB_APP_URL_CENTRO, {
+        method: "POST",
+        mode: "no-cors",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(datosVoces)
+      })
+      .then(function() {
+        mostrarAlerta("🌀 ¡" + nombreTxt + " registrado con éxito en la bitácora del sonido!");
+        
+        // Armar el mensaje nativo local
+        var condicionTxt = datosVoces.tipoParticipante;
+        mensajeWhatsAppListo = "¡Hola *" + nombreTxt.trim() + "*! 🌀 Confirmamos tu registro para el próximo encuentro del Coro Jeyajé Arco Iris.\n\n📍 *Lugar:* Km 12 doble vía a La Guardia (Maloca Central)\n🗺️ *Mapa:* https://google.com\n✨ *Condición:* " + condicionTxt + "\n\n🎵 *RECOMENDACIONES:* \n• Traer ropa cómoda y ligera.\n• Tu botellita de agua para cuidar la voz.\n• Si tienes instrumentos, son bienvenidos.\n\n¡Tu voz expande el rezo!";
+        
+        document.getElementById("wa-box").style.display = "block";
+        
+        // Limpieza de campos
+        document.getElementById("nombreRezador").value = "";
+        document.getElementById("telefono").value = "";
+        document.getElementById("invitadoPor").value = "";
+        document.getElementById("notas").value = "";
+      });
+    }
+
+    function dispararWhatsAppCentro() {
+      if (!telefonoDestino) { alert("No hay un número de teléfono válido."); return; }
+      var urlWa = "https://whatsapp.com" + telefonoDestino + "&text=" + encodeURIComponent(mensajeWhatsAppListo);
+      window.open(urlWa, '_blank');
+    }
+  </script>
+</body>
+</html>
