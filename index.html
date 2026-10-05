@@ -22,7 +22,7 @@
     .panel-encargada { display: none; margin-top: 20px; border-top: 2px dashed #00a896; padding-top: 15px; }
     
     .rezador-row { background: #f9fbfb; border: 1px solid #cbd5e0; border-left: 5px solid #00a896; padding: 12px; border-radius: 6px; margin-bottom: 10px; text-align: left; font-size: 13px; }
-    button.wa-send-btn { background-color: #0288d1; color: white; border: none; padding: 12px; border-radius: 6px; font-size: 13px; font-weight: bold; cursor: pointer; width: 100%; margin-top: 10px; box-sizing: border-box; display: block; text-align: center; text-decoration: none; }
+    button.wa-send-btn { background-color: #0288d1; color: white; border: none; padding: 8px 12px; border-radius: 4px; font-size: 12px; font-weight: bold; cursor: pointer; width: 100%; margin-top: 8px; box-sizing: border-box; }
   </style>
 </head>
 <body>
@@ -47,7 +47,6 @@
       <div class="card-eter">
         <div class="titulo-card">🎵 Relación con la Tribu</div>
         <label>Condición en el Coro:</label>
-        <!-- CORRECCIÓN SINTÁCTICA DEL TEXTO ROTÓ: LIMPIADO EL DUENDECILLO DE LA PALABRA PAPEL -->
         <select id="tipoParticipante" onchange="document.getElementById('invitado-row').style.display=this.value==='Invitado Nuevo'?'block':'none'">
           <option value="Miembro de la Comunidad">Miembro de la Comunidad</option>
           <option value="Invitado Nuevo">Invitado Nuevo (Primera vez)</option>
@@ -79,8 +78,12 @@
   </div>
   <script>
     // URL PROVISTA POR TU CUENTA DE GOOGLE APPS SCRIPT DE LA DIRECCIÓN CENTRO
-    const WEB_APP_URL_CENTRO = "https://script.google.com/macros/s/AKfycbyX004eMgKsAog5quWxah61axltlwYBsOOYaVEdYt_fjfalif70FgTa0jdpfAgDezucIQ/exec";
-    var plantillaVivaDesdeSheets = ""; 
+    const WEB_APP_URL_CENTRO = "https://script.google.com/macros/s/AKfycbxKkDprslkNdQ9QvFmEEo1k2hvApLwFkaB7Qvdq7VO2g0NpjmtZMvY5Ijgrc4HG1mTg3g/exec";
+    
+    // Variables de control clonadas del Norte
+    var globalRegistros = [];
+    var pAsistente = "";
+    var pStaff = "";
 
     function avisarEstado(txt) {
       var box = document.getElementById("status-box");
@@ -88,7 +91,6 @@
       window.scrollTo(0,0);
     }
 
-    // 1. ENVÍO DESDE LA PANTALLA GENERAL LIBRE (COMUNIDAD)
     function guardarInscripcionPublica() {
       var nombreTxt = document.getElementById("nombreRezador").value;
       var telfTxt = document.getElementById("telefono").value;
@@ -96,13 +98,14 @@
       
       avisarEstado("Enviando hilos sonoros al altar del Centro...");
 
+      // Mapeo idéntico al mecanismo del Norte
       var datos = {
-        target_sheet: "Coro_Historial",
         tipo: document.getElementById("tipoParticipante").value,
         n: nombreTxt,
         w: telfTxt,
         cat: document.getElementById("invitadoPor").value || "-",
-        e: document.getElementById("notas").value || "-"
+        e: document.getElementById("notas").value || "-",
+        i: "-"
       };
 
       fetch(WEB_APP_URL_CENTRO, {
@@ -120,7 +123,6 @@
       });
     }
 
-    // 2. FILTRO DE ENTRADA EXCLUSIVO PARA LA ENCARGADA
     function abrirConsolaEncargada() {
       var clave = prompt("Introduce la clave de la Encargada del Centro:");
       if (clave === "Eter2026" || clave === "2009") { 
@@ -131,7 +133,7 @@
       }
     }
 
-    // 3. JALAR INTEGRANTES DESDE EL SHEETS AL TELÉFONO DE LA ENCARGADA
+    // CLON DE LA LOGICA DE LECTURA DEL NORTE
     function cargarRezadoresInscritos() {
       var listaBox = document.getElementById("listado-rezadores-vivos");
       listaBox.innerHTML = "<p style='font-size:12px; color:#7f8c8d;'>Leyendo el registro oficial de voces...</p>";
@@ -139,75 +141,56 @@
       fetch(WEB_APP_URL_CENTRO)
         .then(res => res.json())
         .then(data => {
-          plantillaVivaDesdeSheets = data.plantillaCentro || ""; 
+          globalRegistros = data.registros;
+          pAsistente = data.plantillaAsistente;
+          pStaff = data.plantillaStaff;
           
-          if (!data || !data.registros || data.registros.length === 0) {
-            listaBox.innerHTML = "<p style='font-size:12px; color:#7f8c8d;'>No hay voces en espera en esta luna.</p>";
+          if (!globalRegistros || globalRegistros.length === 0) {
+            listaBox.innerHTML = "<p style='font-size:12px; color:#7f8c8d;'>No hay voces registradas en esta luna.</p>";
             return;
           }
           
           listaBox.innerHTML = "";
-          var lista = data.registros;
           
-          for (var i = 0; i < lista.length; i++) {
-            var r = lista[i];
-            
-            var telfRezador = r.w ? r.w.toString().trim() : "";
-            var nombreRezador = r.n ? r.n.toString().trim() : "";
-            var tipoRezador = r.tipo ? r.tipo.toString().trim() : "";
-            var notaRezador = r.e ? r.e.toString().trim() : "-";
-            var sponsorRezador = (r.cat && r.cat !== "-") ? " (Por: " + r.cat + ")" : "";
-            
+          for (var i = 0; i < globalRegistros.length; i++) {
+            var r = globalRegistros[i];
             var div = document.createElement("div");
             div.className = "rezador-row";
             
-            var htmlContenido = "<b>👤 Rezador:</b> " + nombreRezador + "<br>";
-            htmlContenido += "<b>📱 Teléfono:</b> " + telfRezador + "<br>";
-            htmlContenido += "<b>✨ Condición:</b> " + tipoRezador + sponsorRezador + "<br>";
-            htmlContenido += "<b>📝 Notas:</b> " + notaRezador + "<br>";
+            div.innerHTML = "<b>👤 Rezador:</b> " + r.n + "<br>" +
+                            "<b>📱 Teléfono:</b> " + r.w + "<br>" +
+                            "<b>✨ Condición:</b> " + r.tipo + (r.cat !== "-" ? " (Por: " + r.cat + ")" : "") + "<br>" +
+                            "<b>📝 Notas:</b> " + r.e + "<br>" +
+                            "<button class='wa-send-btn' onclick='dispararWhatsAppClonado(" + i + ")'>📲 Enviar Confirmación e Indicaciones</button>";
             
-            // Inyección limpia usando el formato de atributos data planos
-            htmlContenido += "<button class='wa-send-btn' data-telf='" + telfRezador + "' data-nom='" + nombreRezador + "' data-tipo='" + tipoRezador + "' onclick='dispararWhatsAppEstiloNorte(this)'>📲 Enviar Confirmación e Indicaciones</button>";
-            
-            div.innerHTML = htmlContenido;
             listaBox.appendChild(div);
           }
         })
         .catch(err => {
-          listaBox.innerHTML = "<p style='font-size:12px; color:#c0392b;'>❌ Error al decodificar: " + err.toString() + "</p>";
+          listaBox.innerHTML = "<p style='font-size:12px; color:#c0392b;'>❌ Error: " + err.toString() + "</p>";
         });
     }
 
-    // 🔒 DISPARADOR TOTALMENTE BLINDADO CONTRA COLAPSOS DE TEXTO
-    function dispararWhatsAppEstiloNorte(btnElement) {
-      var telf = btnElement.getAttribute("data-telf");
-      var nombre = btnElement.getAttribute("data-nom");
-      var tipo = btnElement.getAttribute("data-tipo");
+    // FUNCIÓN DE DISPARO CLONADA LITERAL DEL NORTE
+    function dispararWhatsAppClonado(index) {
+      var item = globalRegistros[index];
+      if (!item.w || item.w === "-") { alert("Número inválido."); return; }
       
-      if (!telf || telf === "-") { alert("Este número no es válido."); return; }
+      // Decidir plantilla según el tipo, tal como hace el Norte
+      var plantilla = (item.tipo === "Invitado Nuevo") ? pAsistente : pStaff;
       
-      var textoFinal = "";
-      
-      // Control de protección: si la plantilla del Sheets vino correcta, reemplaza; si no, inyecta el rezo base directo
-      if (plantillaVivaDesdeSheets && plantillaVivaDesdeSheets.includes("{")) {
-        try {
-          textoFinal = plantillaVivaDesdeSheets.replace(/{NOMBRE}/gi, nombre)
-                                               .replace(/{CONDICION}/gi, tipo);
-        } catch(e) {
-          textoFinal = "";
-        }
+      // Si la plantilla está vacía en el Sheets, inyecta el rezo base de seguridad
+      if (!plantilla) {
+        plantilla = "¡Hola *{NOMBRE}*! 🌀 Confirmamos tu registro para el próximo encuentro del Coro Jeyajé Arco Iris. 📍 Lugar: Maloca Central, Km 12 doble vía a La Guardia. ✨ Condición: {CONDICION}. ¡Tu voz expande el rezo!";
       }
       
-      // ESCUDO DE RESISTENCIA: Mensaje base por si falla el formateo de comillas en el navegador
-      if (!textoFinal) {
-        textoFinal = "¡Hola *" + nombre + "*! 🌀 Confirmamos tu registro para el próximo encuentro del Coro Jeyajé Arco Iris.\n\n📍 *Lugar:* Maloca Central, Km 12 doble vía a La Guardia.\n🗺️ *Mapa:* https://google.com\n✨ *Condición:* " + tipo + "\n\n🎵 *RECOMENDACIONES:* Traer ropa cómoda y botellita de agua. ¡Tu voz expande el rezo!";
-      }
+      var textoFinal = plantilla.replace(/{NOMBRE}/g, item.n)
+                                .replace(/{CONDICION}/g, item.tipo);
       
-      var urlWa = "https://whatsapp.com" + telf.trim() + "&text=" + encodeURIComponent(textoFinal);
-      
-      // Salto directo lineal que ningún navegador de PC o celular bloquea
-      window.location.href = urlWa;
+      var urlWa = "https://whatsapp.com" + item.w.toString().trim() + "&text=" + encodeURIComponent(textoFinal);
+      window.open(urlWa, '_blank');
     }
   </script>
 </body>
 </html>
+
