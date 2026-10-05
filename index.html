@@ -47,7 +47,7 @@
       <div class="card-eter">
         <div class="titulo-card">🎵 Relación con la Tribu</div>
         <label>Condición en el Coro:</label>
-        <select id="tipoParticipante" onchange="document.getElementById('invitado-row').style.display=this.value Papel ==='Invitado Nuevo'?'block':'none'">
+        <select id="tipoParticipante" onchange="document.getElementById('invitado-row').style.display=this.value==='Invitado Nuevo'?'block':'none'">
           <option value="Miembro de la Comunidad">Miembro de la Comunidad</option>
           <option value="Invitado Nuevo">Invitado Nuevo (Primera vez)</option>
         </select>
@@ -78,8 +78,8 @@
   </div>
   <script>
     // URL PROVISTA POR TU CUENTA DE GOOGLE APPS SCRIPT DE LA DIRECCIÓN CENTRO
-    const WEB_APP_URL_CENTRO = "https://script.google.com/macros/s/AKfycbx6gFu5TaWj2O5A4DMa18TOwNdyqXr7P2jbtEpWKsZDT97e_mS9zSm0kOGGRACf48NI2A/exec";
-    var plantillaVivaDesdeSheets = ""; // Almacena el texto dinámico de la celda A2
+    const WEB_APP_URL_CENTRO = "https://script.google.com/macros/s/AKfycbzcAhBt7vWUYFWX16RNr6pbLcx3v9Vn9duwbb7J6zDMO0BqEIoewM3KptasUswqCUF61A/exec";
+    var plantillaVivaDesdeSheets = ""; 
 
     function avisarEstado(txt) {
       var box = document.getElementById("status-box");
@@ -135,7 +135,7 @@
       fetch(WEB_APP_URL_CENTRO)
         .then(res => res.json())
         .then(data => {
-          plantillaVivaDesdeSheets = data.plantillaCentro; // Captura el rezo del Sheets
+          plantillaVivaDesdeSheets = data.plantillaCentro; 
           
           if (!data || !data.registros || data.registros.length === 0) {
             listaBox.innerHTML = "<p style='font-size:12px; color:#7f8c8d;'>No hay voces en espera en esta luna.</p>";
@@ -162,7 +162,7 @@
             htmlContenido += "<b>✨ Condición:</b> " + tipoRezador + sponsorRezador + "<br>";
             htmlContenido += "<b>📝 Notas:</b> " + notaRezador + "<br>";
             
-            // Mecanismo de envío limpio inyectando las variables en atributos planos del botón
+            // Inyección limpia usando el formato de atributos data planos
             htmlContenido += "<button class='wa-send-btn' data-telf='" + telfRezador + "' data-nom='" + nombreRezador + "' data-tipo='" + tipoRezador + "' onclick='dispararWhatsAppEstiloNorte(this)'>📲 Enviar Confirmación e Indicaciones</button>";
             
             div.innerHTML = htmlContenido;
@@ -174,7 +174,6 @@
         });
     }
 
-    // 🔒 LA FUNCIÓN MÁGICA DEL NORTE: Procesa las etiquetas dinámicas {NOMBRE} y {CONDICION} de tu celda A2
     function dispararWhatsAppEstiloNorte(btnElement) {
       var telf = btnElement.getAttribute("data-telf");
       var nombre = btnElement.getAttribute("data-nom");
@@ -183,7 +182,6 @@
       if (!telf || telf === "-") { alert("Este número no es válido."); return; }
       if (!plantillaVivaDesdeSheets) { alert("No se ha cargado la plantilla desde la pestaña Configuración."); return; }
       
-      // Reemplazo inteligente idéntico al Norte
       var textoFinal = plantillaVivaDesdeSheets.replace(/{NOMBRE}/g, nombre)
                                                .replace(/{CONDICION}/g, tipo);
       
