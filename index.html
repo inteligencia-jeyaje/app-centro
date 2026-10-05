@@ -87,6 +87,7 @@
       window.scrollTo(0,0);
     }
 
+    // 1. ENVÍO DESDE LA PANTALLA GENERAL LIBRE (COMUNIDAD)
     function guardarInscripcionPublica() {
       var nombreTxt = document.getElementById("nombreRezador").value;
       var telfTxt = document.getElementById("telefono").value;
@@ -118,6 +119,7 @@
       });
     }
 
+    // 2. FILTRO DE ENTRADA EXCLUSIVO PARA LA ENCARGADA
     function abrirConsolaEncargada() {
       var clave = prompt("Introduce la clave de la Encargada del Centro:");
       if (clave === "Eter2026" || clave === "2009") { 
@@ -128,6 +130,7 @@
       }
     }
 
+    // 3. JALAR LOS REGISTROS DESDE EL SHEETS AL TELÉFONO DE LA ENCARGADA
     function cargarRezadoresInscritos() {
       var listaBox = document.getElementById("listado-rezadores-vivos");
       listaBox.innerHTML = "<p style='font-size:12px; color:#7f8c8d;'>Leyendo el registro oficial de voces...</p>";
@@ -162,7 +165,6 @@
             htmlContenido += "<b>✨ Condición:</b> " + tipoRezador + sponsorRezador + "<br>";
             htmlContenido += "<b>📝 Notas:</b> " + notaRezador + "<br>";
             
-            // Inyección limpia usando el formato de atributos data planos
             htmlContenido += "<button class='wa-send-btn' data-telf='" + telfRezador + "' data-nom='" + nombreRezador + "' data-tipo='" + tipoRezador + "' onclick='dispararWhatsAppEstiloNorte(this)'>📲 Enviar Confirmación e Indicaciones</button>";
             
             div.innerHTML = htmlContenido;
@@ -174,20 +176,24 @@
         });
     }
 
+    // 🔒 LA FUNCIÓN REDIRECCIÓN: Cambiada window.open por window.location.href para saltar directo sin bloqueos
     function dispararWhatsAppEstiloNorte(btnElement) {
       var telf = btnElement.getAttribute("data-telf");
       var nombre = btnElement.getAttribute("data-nom");
       var tipo = btnElement.getAttribute("data-tipo");
       
       if (!telf || telf === "-") { alert("Este número no es válido."); return; }
-      if (!plantillaVivaDesdeSheets) { alert("No se ha cargado la plantilla desde la pestaña Configuración."); return; }
+      if (!plantillaVivaDesdeSheets) { alert("No hay una plantilla activa."); return; }
       
       var textoFinal = plantillaVivaDesdeSheets.replace(/{NOMBRE}/g, nombre)
                                                .replace(/{CONDICION}/g, tipo);
       
       var urlWa = "https://whatsapp.com" + telf.trim() + "&text=" + encodeURIComponent(textoFinal);
-      window.open(urlWa, '_blank');
+      
+      // Salto directo lineal que ningún navegador se atreve a bloquear
+      window.location.href = urlWa;
     }
   </script>
 </body>
 </html>
+
