@@ -76,7 +76,7 @@
       <div id="listado-rezadores-vivos"></div>
     </div>
   </div>
-    <script>
+  <script>
     // URL PROVISTA POR TU CUENTA DE GOOGLE APPS SCRIPT DE LA DIRECCIÓN CENTRO
     const WEB_APP_URL_CENTRO = "https://script.google.com/macros/s/AKfycbxxxIwcZPkbiiPfarVYKTMfO54FqVqkEYHLAfxpnbUMnt6rYi4cSNWOrGHHSAl37tDtrg/exec";
 
@@ -145,13 +145,12 @@
           listaBox.innerHTML = "";
           var lista = data.registros;
           
-          var ubicacionFija = "Templo Jeyajé, Calle Pedro Galvez 3826 Zona Av. Paraguá casi 4to. Anillo";
+          var ubicacionFija = "Templo Jeyajé, Calle Pedro Galvez 3826, Zona Av. Paraguá casi 4to. Anillo";
           var mapaFijo = "https://maps.app.goo.gl/sP8nXgYoFUQt14Po7";
           
           for (var i = 0; i < lista.length; i++) {
             var r = lista[i];
             
-            // Reclamos de variables limpias para evitar roturas por nulos
             var telfRezador = r.w ? r.w.toString().trim() : "";
             var nombreRezador = r.n ? r.n.toString().trim() : "";
             var tipoRezador = r.tipo ? r.tipo.toString().trim() : "";
@@ -174,12 +173,12 @@
             var div = document.createElement("div");
             div.className = "rezador-row";
             
-            // Construcción concatenada limpia y blindada contra errores tipográficos
+            // 🔒 SOLUCIÓN MAESTRA: Se cambia target='_blank' por target='_top' para burlar el bloqueo de popups
             var htmlContenido = "<b>👤 Rezador:</b> " + nombreRezador + "<br>";
             htmlContenido += "<b>📱 Teléfono:</b> " + telfRezador + "<br>";
             htmlContenido += "<b>✨ Condición:</b> " + tipoRezador + sponsorRezador + "<br>";
             htmlContenido += "<b>📝 Notas:</b> " + notaRezador + "<br>";
-            htmlContenido += "<a href='" + urlEnlaceWhatsApp + "' target='_blank' style='" + estiloBotonLink + "'>📲 Enviar Confirmación y Ubicación</a>";
+            htmlContenido += "<a href='" + urlEnlaceWhatsApp + "' target='_top' style='" + estiloBotonLink + "'>📲 Enviar Confirmación y Ubicación</a>";
             
             div.innerHTML = htmlContenido;
             listaBox.appendChild(div);
