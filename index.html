@@ -76,11 +76,12 @@
       <div id="listado-rezadores-vivos"></div>
     </div>
   </div>
+
   <script>
     // URL PROVISTA POR TU CUENTA DE GOOGLE APPS SCRIPT DE LA DIRECCIÓN CENTRO
-    const WEB_APP_URL_CENTRO = "https://script.google.com/macros/s/AKfycbxf4ZVB_9cO74W0YBmAuZpRo2YE6riZmVDjMDBb1vaG0yiSa-Bs5CFHzfWvSFDRZeiUmQ/exec";
+    // REEMPLAZA ESTA LÍNEA CON TU URL LARGA DE APPS SCRIPT ACTUALIZADA A "ANYONE"
+    const WEB_APP_URL_CENTRO = "PEGA_AQUÍ_TU_URL_DE_APPS_SCRIPT_DEL_CENTRO";
     
-    // Variables de control clonadas del Norte
     var globalRegistros = [];
     var pAsistente = "";
     var pStaff = "";
@@ -98,7 +99,7 @@
       
       avisarEstado("Enviando hilos sonoros al altar del Centro...");
 
-      // Mapeo idéntico al mecanismo del Norte
+      // Mapeo idéntico y corregido al patrón estructural puro del Norte
       var datos = {
         tipo: document.getElementById("tipoParticipante").value,
         n: nombreTxt,
@@ -120,6 +121,9 @@
         document.getElementById("telefono").value = "";
         document.getElementById("invitadoPor").value = "";
         document.getElementById("notas").value = "";
+      })
+      .catch(function(err) {
+        alert("❌ Error de red: " + err.toString());
       });
     }
 
@@ -133,7 +137,6 @@
       }
     }
 
-    // CLON DE LA LOGICA DE LECTURA DEL NORTE
     function cargarRezadoresInscritos() {
       var listaBox = document.getElementById("listado-rezadores-vivos");
       listaBox.innerHTML = "<p style='font-size:12px; color:#7f8c8d;'>Leyendo el registro oficial de voces...</p>";
@@ -171,15 +174,12 @@
         });
     }
 
-    // FUNCIÓN DE DISPARO CLONADA LITERAL DEL NORTE
     function dispararWhatsAppClonado(index) {
       var item = globalRegistros[index];
       if (!item.w || item.w === "-") { alert("Número inválido."); return; }
       
-      // Decidir plantilla según el tipo, tal como hace el Norte
       var plantilla = (item.tipo === "Invitado Nuevo") ? pAsistente : pStaff;
       
-      // Si la plantilla está vacía en el Sheets, inyecta el rezo base de seguridad
       if (!plantilla) {
         plantilla = "¡Hola *{NOMBRE}*! 🌀 Confirmamos tu registro para el próximo encuentro del Coro Jeyajé Arco Iris. 📍 Lugar: Maloca Central, Km 12 doble vía a La Guardia. ✨ Condición: {CONDICION}. ¡Tu voz expande el rezo!";
       }
@@ -193,4 +193,3 @@
   </script>
 </body>
 </html>
-
