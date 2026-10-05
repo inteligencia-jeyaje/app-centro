@@ -80,7 +80,7 @@
 
   <script>
     // URL PROVISTA POR TU CUENTA DE GOOGLE APPS SCRIPT DE LA DIRECCIÓN CENTRO
-    const WEB_APP_URL_CENTRO = "https://script.google.com/macros/s/AKfycbwyOgQvQ9p6gcvqtuixXKpmNn_1O9tmx1qJpf5_esITAWPrQel60iLKSomeR75TQUu-DA/exec";
+    const WEB_APP_URL_CENTRO = "https://script.google.com/macros/s/AKfycbyX004eMgKsAog5quWxah61axltlwYBsOOYaVEdYt_fjfalif70FgTa0jdpfAgDezucIQ/exec";
     var plantillaVivaDesdeSheets = ""; 
 
     function avisarEstado(txt) {
@@ -89,6 +89,7 @@
       window.scrollTo(0,0);
     }
 
+    // 1. ENVÍO DESDE LA PANTALLA GENERAL LIBRE (COMUNIDAD)
     function guardarInscripcionPublica() {
       var nombreTxt = document.getElementById("nombreRezador").value;
       var telfTxt = document.getElementById("telefono").value;
@@ -120,6 +121,7 @@
       });
     }
 
+    // 2. FILTRO DE ENTRADA EXCLUSIVO PARA LA ENCARGADA
     function abrirConsolaEncargada() {
       var clave = prompt("Introduce la clave de la Encargada del Centro:");
       if (clave === "Eter2026" || clave === "2009") { 
@@ -130,6 +132,7 @@
       }
     }
 
+    // 3. JALAR INTEGRANTES DESDE EL SHEETS AL TELÉFONO DE LA ENCARGADA
     function cargarRezadoresInscritos() {
       var listaBox = document.getElementById("listado-rezadores-vivos");
       listaBox.innerHTML = "<p style='font-size:12px; color:#7f8c8d;'>Leyendo el registro oficial de voces...</p>";
@@ -150,6 +153,7 @@
           for (var i = 0; i < lista.length; i++) {
             var r = lista[i];
             
+            // Extracción estricta mapeando el formato corto del Norte
             var telfRezador = r.w ? r.w.toString().trim() : "";
             var nombreRezador = r.n ? r.n.toString().trim() : "";
             var tipoRezador = r.tipo ? r.tipo.toString().trim() : "";
@@ -164,8 +168,8 @@
             htmlContenido += "<b>✨ Condición:</b> " + tipoRezador + sponsorRezador + "<br>";
             htmlContenido += "<b>📝 Notas:</b> " + notaRezador + "<br>";
             
-            // Botón nativo blindado
-            htmlContenido += "<button class='wa-send-btn' data-telf='" + telfRezador + "' data-nom='" + nombreRezador + "' data-tipo='" + tipoRezador + "' onclick='dispararWhatsAppEstiloNorte(this)'>📲 Enviar Confirmación e Indicaciones</button>";
+            // CORRECCIÓN MATRIZ: Se inyectan los atributos planos con las variables ya validadas y limpias
+            htmlContenido += "<button class='wa-send-btn' data-telf='" + telfRezador + "' data-nom='" + nombreRezador + "' data-tipo='" + tipoRezador + "' onclick='ejecutarWhatsAppNativo(this)'>📲 Enviar Confirmación e Indicaciones</button>";
             
             div.innerHTML = htmlContenido;
             listaBox.appendChild(div);
@@ -176,22 +180,25 @@
         });
     }
 
-    function dispararWhatsAppEstiloNorte(btnElement) {
+    // 🔒 DISPARADOR DIRECTO NATIVO: Salta al chat sin interferencias de comillas o popups
+    function ejecutarWhatsAppNativo(btnElement) {
       var telf = btnElement.getAttribute("data-telf");
       var nombre = btnElement.getAttribute("data-nom");
       var tipo = btnElement.getAttribute("data-tipo");
       
       if (!telf || telf === "-") { alert("Este número no es válido."); return; }
-      if (!plantillaVivaDesdeSheets) { alert("No hay una plantilla activa en la configuración."); return; }
+      if (!plantillaVivaDesdeSheets) { alert("No se ha cargado la plantilla de indicaciones desde la pestaña Configuración."); return; }
       
+      // Reemplazo inteligente idéntico al Norte
       var textoFinal = plantillaVivaDesdeSheets.replace(/{NOMBRE}/g, nombre)
                                                .replace(/{CONDICION}/g, tipo);
       
       var urlWa = "https://whatsapp.com" + telf.trim() + "&text=" + encodeURIComponent(textoFinal);
       
-      // Salto directo lineal limpio
+      // Salto directo lineal que ningún navegador de PC o celular se atreve a bloquear
       window.location.href = urlWa;
     }
   </script>
 </body>
 </html>
+ 
