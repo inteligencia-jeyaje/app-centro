@@ -223,7 +223,7 @@
       var textoFinal = template.replace(/{NOMBRE}/g, item.n)
                                 .replace(/{CONDICION}/g, item.tipo);
       
-      var urlWa = "https://whatsapp.com" + item.w.toString().trim() + "&text=" + encodeURIComponent(textoFinal);
+      var urlWa = 'https://whatsapp.com' + item.w.toString().trim() + "&text=" + encodeURIComponent(textoFinal);
       window.open(urlWa, '_blank');
     }
 
