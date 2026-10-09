@@ -225,7 +225,7 @@
       var numeroLimpio = item.w.toString().replace(/[^0-9]/g, "");
       
       // 🔒 EL ESCUDO DE VARIABLE DIRECTA: Así se evita que el formateador borre la barra inclinada
-      var dominioWa = "https://wa.me";
+      var dominioWa = "https://wa.me/";
       var urlWa = dominioWa + numeroLimpio + "?text=" + encodeURIComponent(textoFinal);
       
       window.open(urlWa, '_blank');
