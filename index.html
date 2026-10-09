@@ -89,7 +89,7 @@
   <script>
     // URL PROVISTA POR TU CUENTA DE GOOGLE APPS SCRIPT DE LA DIRECCIÓN CENTRO
     // IMPORTANTE: Asegúrate de que esta URL termine exactamente en /exec
-    const WEB_APP_URL_CENTRO = "PEGA_AQUÍ_TU_URL_DE_APPS_SCRIPT_DEL_CENTRO";
+    const WEB_APP_URL_CENTRO = "https://script.google.com/macros/s/AKfycbw6MwcTKTQTaH70FWIgXpYffkcy_hUa0le5B1-4AEPmDxUpxxg0lCPa05dYOYVjVnDA3g/exec";
     
     var globalRegistros = [];
     var pAsistente = "";
@@ -217,7 +217,7 @@
       var template = (item.tipo === "Invitado Nuevo") ? pAsistente : pStaff;
       
       if (!template) {
-        template = "¡Hola *{NOMBRE}*! 🌀 Confirmamos tu registro para el próximo encuentro del Coro Jeyajé Arco Iris. 📍 Lugar: Maloca Central, Km 12 doble vía a La Guardia. ✨ Condición: {CONDICION}. ¡Tu voz expande el rezo!";
+        template = "¡Hola *{NOMBRE}*! 🌀 Confirmamos tu registro para el próximo encuentro del Coro Jeyajé Arco Iris. 📍 Lugar: Templo Jeyajé, Calle Pedro Galvez 3826 zona Av. Paraguá casi 4to. Anillo. ✨ Condición: {CONDICION}. ¡Tu voz expande el rezo!";
       }
       
       var textoFinal = template.replace(/{NOMBRE}/g, item.n)
