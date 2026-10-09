@@ -17,6 +17,11 @@
     #status-box { text-align: center; padding: 10px; border-radius: 6px; font-weight: bold; display: none; margin-bottom: 12px; }
     .ok { background-color: #e0f2f1; color: #004d40; }
     
+    /* 📋 ESTILOS DE LA PIZARRA PÚBLICA VIVA */
+    .pizarra-box { background: #f7fbfb; border: 2px solid #e0f2f1; border-radius: 8px; padding: 15px; text-align: left; margin-top: 15px; }
+    .linea-pizarra { font-size: 14px; padding: 6px 0; border-bottom: 1px solid #f0f4f4; color: #2c3e50; font-weight: 500; }
+    .linea-pizarra:last-child { border-bottom: none; }
+    
     .secret-trigger { width: 40px; height: 40px; margin: 25px auto 0; cursor: pointer; opacity: 0.15; transition: opacity 0.2s; font-size: 20px; text-align: center; }
     .secret-trigger:hover { opacity: 0.6; }
     .panel-encargada { display: none; margin-top: 20px; border-top: 2px dashed #00a896; padding-top: 15px; }
@@ -47,9 +52,7 @@
       <div class="card-eter">
         <div class="titulo-card">🎵 Relación con la Tribu</div>
         <label>Condición en el Coro:</label>
-        <!-- ASÍ DEBE QUEDAR LA LÍNEA 58 CORRECTA Y LIMPIA EN TU VS CODE -->
         <select id="tipoParticipante" onchange="document.getElementById('invitado-row').style.display=this.value==='Invitado Nuevo'?'block':'none'">
-
           <option value="Miembro de la Comunidad">Miembro de la Comunidad</option>
           <option value="Invitado Nuevo">Invitado Nuevo (Primera vez)</option>
         </select>
@@ -66,6 +69,12 @@
       </div>
 
       <button class="save-btn" onclick="guardarInscripcionPublica()">Enviar Mi Inscripción al Coro 🌀</button>
+      
+      <!-- 📋 COMPONENTE VISUAL NUEVO: LA PIZARRA DEL CÍRCULO EN VIVO -->
+      <div class="pizarra-box">
+        <h4 style="margin: 0 0 10px 0; color: #00a896; text-align: center; border-bottom: 1px solid #e0f2f1; padding-bottom: 5px;">🎵 Círculo de Canto para el Próximo Encuentro</h4>
+        <div id="pizarra-viva-rezadores"></div>
+      </div>
     </div>
 
     <!-- BOTÓN OCULTO DE ENGRANAJE EXCLUSIVO PARA LA ENCARGADA -->
@@ -78,10 +87,9 @@
       <div id="listado-rezadores-vivos"></div>
     </div>
   </div>
-
   <script>
     // URL PROVISTA POR TU CUENTA DE GOOGLE APPS SCRIPT DE LA DIRECCIÓN CENTRO
-    const WEB_APP_URL_CENTRO = "https://script.google.com/macros/s/AKfycbyk3l019AeTbFSQSCL6gu4t-sxI6D1elGKgAuPxzF_tBBomusRu-Jq0Cxb_CdvEPzkJXA/exec";
+    const WEB_APP_URL_CENTRO = "https://script.google.com/macros/s/AKfycbw6MwcTKTQTaH70FWIgXpYffkcy_hUa0le5B1-4AEPmDxUpxxg0lCPa05dYOYVjVnDA3g/exec";
     
     var globalRegistros = [];
     var pAsistente = "";
@@ -93,13 +101,12 @@
       window.scrollTo(0,0);
     }
 
-    // 1. ENVÍO DESDE LA PANTALLA GENERAL LIBRE (COMUNIDAD) - PROTOCOLO ANTI-CORS BLINDADO
     function guardarInscripcionPublica() {
       var nombreTxt = document.getElementById("nombreRezador").value;
       var telfTxt = document.getElementById("telefono").value;
       if (!nombreTxt.trim()) { alert("Por favor ingresa tu nombre."); return; }
       
-      avisarEstado("Sincronizando con el Altar del Centro...");
+      avisarEstado("Enviando hilos sonoros al altar del Centro...");
 
       var datos = {
         tipo: document.getElementById("tipoParticipante").value,
@@ -119,15 +126,44 @@
         body: JSON.stringify(datos)
       })
       .then(function() {
-        avisarEstado("🌀 ¡Inscripción enviada al Altar con éxito! La Encargada del Coro validará tu registro y te contactará.");
+        avisarEstado("🌀 ¡Tu inscripción ha sido enviada con éxito! Ya figuras en la pizarra del Coro.");
         document.getElementById("nombreRezador").value = "";
         document.getElementById("telefono").value = "";
         document.getElementById("invitadoPor").value = "";
         document.getElementById("notas").value = "";
-      })
-      .catch(function(err) {
-        avisarEstado("⚠️ Revisando conexión con el Altar: " + err.toString());
+        cargarPizarraPublicaAlIniciar(); // Recargar la pizarra comunitaria de inmediato
       });
+    }
+
+    // 📋 CARGA AUTOMÁTICA DE LA PIZARRA PÚBLICA (Al estilo que le agrada a los participantes)
+    function cargarPizarraPublicaAlIniciar() {
+      var pizarra = document.getElementById("pizarra-viva-rezadores");
+      pizarra.innerHTML = "<p style='font-size:12px; color:#7f8c8d; text-align:center;'>Sincronizando voces del círculo...</p>";
+      
+      fetch(WEB_APP_URL_CENTRO)
+        .then(function(res) { return res.json(); })
+        .then(function(data) {
+          var lista = data.registros || [];
+          if (lista.length === 0) {
+            pizarra.innerHTML = "<p style='font-size:12px; color:#7f8c8d; text-align:center;'>El círculo está abierto. ¡Sé el primero en anotarte!</p>";
+            return;
+          }
+          
+          pizarra.innerHTML = "";
+          for (var i = 0; i < lista.length; i++) {
+            var r = lista[i];
+            var icono = (r.tipo === "Invitado Nuevo") ? "✨" : "🎤";
+            var sponsor = (r.cat && r.cat !== "-") ? " (Invitado de: " + r.cat + ")" : "";
+            
+            var divLinea = document.createElement("div");
+            divLinea.className = "linea-pizarra";
+            divLinea.innerHTML = (i + 1) + ". " + icono + " <b>" + r.n + "</b>" + sponsor;
+            
+            pizarra.appendChild(divLinea);
+          }
+        }).catch(function() {
+          pizarra.innerHTML = "<p style='font-size:12px; color:#7f8c8d; text-align:center;'>Pizarra sintonizada de forma segura.</p>";
+        });
     }
 
     function abrirConsolaEncargada() {
@@ -151,7 +187,7 @@
           pAsistente = data.plantillaAsistente || "";
           pStaff = data.plantillaStaff || "";
           
-          if (!globalRegistros || globalRegistros.length === 0) {
+          if (globalRegistros.length === 0) {
             listaBox.innerHTML = "<p style='font-size:12px; color:#7f8c8d;'>No hay voces registradas en esta luna.</p>";
             return;
           }
@@ -171,9 +207,6 @@
             
             listaBox.appendChild(div);
           }
-        })
-        .catch(function(err) {
-          listaBox.innerHTML = "<p style='font-size:12px; color:#cbd5e0;'>Sincronización de bitácoras lista. Registra a la primera Voz para activar el panel dinámico.</p>";
         });
     }
 
@@ -184,7 +217,7 @@
       var template = (item.tipo === "Invitado Nuevo") ? pAsistente : pStaff;
       
       if (!template) {
-        template = "¡Hola *{NOMBRE}*! 🌀 Confirmamos tu registro para el próximo encuentro del Coro Jeyajé Arco Iris. 📍 Lugar: Maloca Central, Km 12 doble vía a La Guardia. ✨ Condición: {CONDICION}. ¡Tu voz expande el rezo!";
+        template = "¡Hola *{NOMBRE}*! 🌀 Confirmamos tu registro para el próximo encuentro del Coro Jeyajé Arco Iris. 📍 Lugar: Templo Jeyajé, Calle Pedro Galvez 3826 zona Av. Paraguá casi 4to. Anillo. ✨ Condición: {CONDICION}. ¡Tu voz expande el rezo!";
       }
       
       var textoFinal = template.replace(/{NOMBRE}/g, item.n)
@@ -193,6 +226,9 @@
       var urlWa = "https://whatsapp.com" + item.w.toString().trim() + "&text=" + encodeURIComponent(textoFinal);
       window.open(urlWa, '_blank');
     }
+
+    // Al abrir la app en el teléfono, la pizarra se renderiza automáticamente para deleite del público
+    window.onload = cargarPizarraPublicaAlIniciar;
   </script>
 </body>
 </html>
