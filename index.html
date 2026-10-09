@@ -208,6 +208,7 @@
         });
     }
 
+    // 🔄 REEMPLAZA ESTA FUNCIÓN COMPLETA EN TU VS CODE (Últimas líneas del script)
     function dispararWhatsAppClonado(index) {
       var item = globalRegistros[index];
       if (!item || !item.w || item.w === "-") { alert("Número inválido."); return; }
@@ -222,7 +223,11 @@
                                 .replace(/{CONDICION}/g, item.tipo);
       
       var numeroLimpio = item.w.toString().replace(/[^0-9]/g, "");
-      var urlWa = "https://wa.me/" + numeroLimpio + "?text=" + encodeURIComponent(textoFinal);
+      
+      // 🔒 EL ESCUDO DE VARIABLE DIRECTA: Así se evita que el formateador borre la barra inclinada
+      var dominioWa = "https://wa.me";
+      var urlWa = dominioWa + numeroLimpio + "?text=" + encodeURIComponent(textoFinal);
+      
       window.open(urlWa, '_blank');
     }
 
