@@ -216,7 +216,7 @@
       var template = (item.tipo === "Invitado Nuevo") ? pAsistente : pStaff;
       
       if (!template) {
-        template = "¡Hola *{NOMBRE}*! 🌀 Confirmamos tu registro para el próximo encuentro del Coro Jeyajé Arco Iris. 📍 Lugar: Maloca Central, Km 12 de la doble vía a La Guardia. ✨ Condición: {CONDICION}. ¡Tu voz expande el rezo!";
+        template = "¡Hola *{NOMBRE}*! 🌀 Confirmamos tu registro para el próximo encuentro del Coro Jeyajé Arco Iris. 📍 Lugar: Templo Jeyajé. Calle Pedro Galvez 3826, zona Av. Paraguá casi 4to. Anillo. 🗺️ https://maps.app.goo.gl/sP8nXgYoFUQt14Po7 ✨ Condición: {CONDICION}. ¡Tu voz expande el rezo!";
       }
       
       var textoFinal = template.replace(/{NOMBRE}/g, item.n)
