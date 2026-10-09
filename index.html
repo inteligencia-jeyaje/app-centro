@@ -222,7 +222,7 @@
                                 .replace(/{CONDICION}/g, item.tipo);
       
       var numeroLimpio = item.w.toString().replace(/[^0-9]/g, "");
-      var urlWa = "https://wa.me" + numeroLimpio + "?text=" + encodeURIComponent(textoFinal);
+      var urlWa = "https://wa.me/" + numeroLimpio + "?text=" + encodeURIComponent(textoFinal);
       window.open(urlWa, '_blank');
     }
 
